@@ -64,21 +64,14 @@ func organicValue(s series.Series) series.Series {
 }
 
 func main() {
-	//"wHy DoN'T yOu UsE A dIfFeReNt lAnGuAgE" BECAUSE THIS WHOLE PROGRAM IS 30 LINES OF CODE IN PYTHON!!!
-	//"bUt PyThOn Is sLoW" the time it took to learn Go syntax, code, and test this will require something like 6000 end-user launches to break even on time.
-	//should I have used Java? probably, but Go has neat API stuff and felt like a better personal growth project.
-	//will this app be lightyears better than the python utility? almost certainly, but at what cost? My sanity?
-	//Pickles.
-
-	//alright, real comments start here
 	//workflow: Open CSV > Convert to dataframe > remove junk columns > clean remaining data in slices > perform column mutations > reassemble final df
 
 	//for real didn't know print would show up in the executable window...probably shouldn't have had dumb prints in final code...
 	fmt.Println("Welcome to the new and improved, super duper fast keyword cleaner.")
 	fmt.Println("Select the Cerebro Export you want de-garbaged")
 	fmt.Println("New file will be placed in the same folder as the source.")
-	fmt.Println("(At least...I think it will.  If not, check the folder the .exe is in.\nIf it's not there...well...this is a new language for me and I don't really know what I'm doing'.  \nYou'll find it. I believe in you.)")
 	fmt.Println("Enjoy your stay.")
+
 	//create open file dialog filtered to .csv files for convenience
 	filename, err := dialog.File().Filter("Microsoft Excel Comma Separated Values", "csv").Load()
 	if err != nil {
@@ -93,11 +86,11 @@ func main() {
 	//create Gota dataframe
 	df := dataframe.ReadCSV(csvFile)
 	csvFile.Close()
-	//drop extra nonsense  THIS IS WHERE NEW CEREBRO COLUMNS NEED TO BE ADDED IF THE EXPORT CHANGES
+	//drop extra nonsense  THIS IS WHERE NEW CEREBRO COLUMNS NEED TO BE ADDED/REMOVED IF THE EXPORT CHANGES
 	df = df.Drop(
-		[]string{"Search Volume Trend (30 days)", "Cerebro IQ Score", "Competing Products", "CPR 8-Day Giveaways", "Sponsored ASINs", "Amazon Recommended", "Sponsored", "Organic", "Sponsored Rank (avg)", "Sponsored Rank (count)", "Amazon Recommended Rank (avg)", "Amazon Recommended Rank (count)", "Relative Rank", "Competitor Rank (avg)", "Ranking Competitors (count)", "Competitor Performance Score"},
+		[]string{"Search Volume Trend (30 days)", "Cerebro IQ Score", "Competing Products", "Sponsored ASINs", "Amazon Recommended", "Sponsored", "Organic", "Sponsored Rank (avg)", "Sponsored Rank (count)", "Amazon Recommended Rank (avg)", "Amazon Recommended Rank (count)", "Relative Rank", "Competitor Rank (avg)", "Ranking Competitors (count)", "Competitor Performance Score"},
 	)
-	//break off keyword and search volume, unfuckify the stupid way H10 handles nulls (turn NaNs into .0001 to allow for log transform)
+	//break off keyword and search volume, normalize the stupid way H10 handles nulls (turn NaNs into .0001 to allow for log transform)
 	phrase := df.Select("Phrase")
 	cleanVolume := df.Select("Search Volume").Rapply(svCleaner)
 	cleanVolume.SetNames("Estimated Search Volume")
