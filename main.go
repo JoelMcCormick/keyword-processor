@@ -70,7 +70,7 @@ func main() {
 	fmt.Println("Welcome to the new and improved, super duper fast keyword cleaner.")
 	fmt.Println("Select the Cerebro Export you want de-garbaged")
 	fmt.Println("New file will be placed in the same folder as the source.")
-	fmt.Println("Enjoy your stay. test")
+	fmt.Println("Enjoy your stay.")
 
 	//create open file dialog filtered to .csv files for convenience
 	filename, err := dialog.File().Filter("Microsoft Excel Comma Separated Values", "csv").Load()
