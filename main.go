@@ -70,7 +70,7 @@ func main() {
 	fmt.Println("Welcome to the new and improved, super duper fast keyword cleaner.")
 	fmt.Println("Select the Cerebro Export you want de-garbaged")
 	fmt.Println("New file will be placed in the same folder as the source.")
-	fmt.Println("Enjoy your stay.")
+	fmt.Println("Enjoy your stay. test")
 
 	//create open file dialog filtered to .csv files for convenience
 	filename, err := dialog.File().Filter("Microsoft Excel Comma Separated Values", "csv").Load()
@@ -88,21 +88,23 @@ func main() {
 	csvFile.Close()
 	//drop extra nonsense  THIS IS WHERE NEW CEREBRO COLUMNS NEED TO BE ADDED/REMOVED IF THE EXPORT CHANGES
 	df = df.Drop(
-		[]string{"Search Volume Trend (30 days)", "Cerebro IQ Score", "Competing Products", "Sponsored ASINs", "Amazon Recommended", "Sponsored", "Organic", "Sponsored Rank (avg)", "Sponsored Rank (count)", "Amazon Recommended Rank (avg)", "Amazon Recommended Rank (count)", "Relative Rank", "Competitor Rank (avg)", "Ranking Competitors (count)", "Competitor Performance Score"},
+		[]string{"Search Volume Trend", "Position (Rank)", "Cerebro IQ Score", "Competing Products", "Sponsored ASINs", "CPR", "Title Density", "Amazon Recommended", "Sponsored", "Organic", "Sponsored Rank (avg)", "Sponsored Rank (count)", "Amazon Recommended Rank (avg)", "Amazon Recommended Rank (count)", "Relative Rank", "Competitor Rank (avg)", "Ranking Competitors (count)", "Competitor Performance Score"},
 	)
+
+	fmt.Println(df)
 	//break off keyword and search volume, normalize the stupid way H10 handles nulls (turn NaNs into .0001 to allow for log transform)
-	phrase := df.Select("Phrase")
+	phrase := df.Select("Keyword Phrase")
 	cleanVolume := df.Select("Search Volume").Rapply(svCleaner)
 	cleanVolume.SetNames("Estimated Search Volume")
 
 	//initialize final df
-	out := dataframe.New(phrase.Col("Phrase"))
+	out := dataframe.New(phrase.Col("Keyword Phrase"))
 	out = out.CBind(cleanVolume)
 
 	//relevance calculation
 	//get rid of newly duplicated columns
 	df = df.Drop(
-		[]string{"Search Volume", "Phrase"},
+		[]string{"Search Volume", "Keyword Phrase"},
 	)
 
 	//iterate through the remaining columns clean data and replace original column(column names change file to file)
@@ -129,7 +131,7 @@ func main() {
 	)
 
 	//write to disk
-	fileName := fmt.Sprintf("./%v.csv", out.Col("Phrase").Val(0))
+	fileName := fmt.Sprintf("./%v.csv", out.Col("Keyword Phrase").Val(0))
 	f, err := os.Create(fileName)
 	if err != nil {
 		panic(err)
@@ -137,5 +139,6 @@ func main() {
 	out.WriteCSV(f)
 
 	//launch final file in excel (or default csv reader if you're a weirdo)
-	open.Start(fmt.Sprintf("%v.csv", out.Col("Phrase").Val(0)))
+	open.Start(fmt.Sprintf("%v.csv", out.Col("Keyword Phrase").Val(0)))
+
 }
